@@ -1,0 +1,340 @@
+  ____    ___  ____    _____             _   
+ |  _ \  |__ \|  _ \  |  __ \           | |  
+ | |_) |    ) | |_) | | |__) |___   ___ | |_ 
+ |  _ <    / /|  _ <  |  _  // _ \ / _ \| __|
+ | |_) |  / /_| |_) | | | \ \ (_) | (_) | |_ 
+ |____/  |____|____/  |_|  \_\___/ \___/ \__|
+                                             
+       ███████████████████████████
+       ███████▀▀▀░░░░░░░▀▀▀███████ 
+       ████▀░░░░░░░░░░░░░░░░░▀████
+       ███│░░░░░░░░░░░░░░░░░░░│███
+       ██▌│░░░░░░░░░░░░░░░░░░░│▐██
+       ██░└┐░░░░░░░░░░░░░░░░░┌┘░██
+       ██░░└┐░░░░░░░░░░░░░░░┌┘░░██
+       ██░░┌┘▄▄▄▄▄░░░░░▄▄▄▄▄└┐░░██
+       ██▌░│██████▌░░░▐██████│░▐██
+       ███░│▐███▀▀░░▄░░▀▀███▌│░███
+       ██▀─┘░░░░░░░▐█▌░░░░░░░└─▀██
+       ██▄░░░▄▄▄▓░░▀█▀░░▓▄▄▄░░░▄██
+       ████▄─┘██▌░░░░░░░▐██└─▄████
+       █████░░▐█─┬┬┬┬┬┬┬─█▌░░█████
+       ████▌░░░▀┬┼┼┼┼┼┼┼┬▀░░░▐████
+       █████▄░░░└┴┴┴┴┴┴┴┘░░░▄█████
+       ███████▄░░░░░░░░░░░▄███████
+       ██████████▄▄▄▄▄▄▄██████████
+       ███████████████████████████
+
+
+              **************
+              >>>  SSH   <<<
+              **************
+
+The "ssh" command in Linux is used to securely log into a remote machine and execute commands on that machine
+
+to see configs of ssh and config listening port: 
+> nano /etc/ssh/sshd_config
+
+With status you will if ssh is active or not and also at wich port is listening. 
+> systemctl status ssh
+> systemctl restart ssh
+
+to check if the machine is LISTENING at port 4242 :
+> ss -tlnp | grep sshd
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++  SSH connection from other pc  ++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+from powershell :
+> ssh USERNAME_HERE@HOST_IP -p PORT
+> ssh USERNAME_HERE@localhost -p 2222
+
+            ****************************
+            >>> Windows ports allow <<<  (not mandatory and risky but can be handy for windows users. )
+            ****************************
+
+In case you are using windows using WSL. windows will block any ssh comunication (from all ports) you will need to open it. REMINDER : these is cybersecurity conserning for your PC because you are maybe letting an open door in the future in your pc. Stay safe and check a bit more about these topic. 
+
+will allow port 2222 : 
+> New-NetFirewallRule -DisplayName "Allow Port 2222" -Direction Inbound -Protocol TCP -LocalPort 2222 -Action Allow
+
+Will check if the rule exists :
+> Get-NetFirewallRule -DisplayName "Allow Port 2222"
+
+Will erase the rule : 
+> Remove-NetFirewallRule -DisplayName "Allow Port 2222"
+
+
+
+
+
+
+            **************
+            >>>  ufw   <<< (firewall)
+            **************
+
+Check current status of firewall and rules :
+> sudo ufw status
+
+Blocks all incoming requests.
+> ufw default deny incoming
+
+Allows all outgoing requests.
+> ufw default allow outgoing
+
+add rule to ufw allow on port 2222 tcp :
+> sudo ufw allow 2222/tcp
+
+Enables UFW (turn ON firewall)
+> ufw enable
+
+erase rule
+> sudo ufw delete allow 22/tcp
+
+
+
+
+
+            ***************
+            >>>  sudo   <<<
+            ***************
+
+sudo settings
+> visudo
+
+Path where the sudo.sh is placed: 
+> cd /var/log/sudo
+
+Read sudo.log : 
+> cat sudo.log
+> head sudo.log
+> nano sudo.log
+
++++++++++++++ Settings parameters +++++++++++++
+	Limits the paths that can be used by sudo to run commands. This setting is already there and you can leave it as it is.
+	>> Defaults  secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" 
+
+	Requires TTY to use sudo.
+	>> Defaults requiretty 
+
+	Displays a custom message when using a wrong password with sudo.
+	>> Defaults badpass_message="WRONG PASSWORD"
+
+	Sets the input logs file.
+	>> Defaults logfile="/var/log/sudo/sudo.log"
+
+	Logs input.
+	>> Defaults log_input 
+
+	Logs output.
+	>> Defaults log_output 
+
+	Sets the directory to save additional output and input logs.
+	>> Defaults iolog_dir=/var/log/sudo
+
+	Limits connection attempts using sudo.
+	>> Defaults passwd_tries=3
+-------------- Settings parameters --------------
+
+
+
+
+
+
+            *****************
+            >>>  hostname <<<
+            *****************           
+change hostname name: 
+> sudo hostnamectl set-hotsname HOSTNAME_HERE
+(then you will need to reboot your machine to the the new name: "sudo reboot")
+
+
+
+
+
+
+
+            ****************
+             >>>  users  <<<
+            ****************
+create new user
+> sudo adduser USERNAME_HERE
+
+
+
+
+
+
+
+            *****************
+            >>>  groups   <<<
+            *****************
+
+create new group:
+> groupadd NEW_GROUP 
+> groupadd user42
+
+comand to add a user to a group
+Adds the chlimous(USERNAME) user to the user42 and sudo groups:
+> usermod -a -G GROUPNAME_HERE,sudo USERNAME_HERE 
+
+To verify the changes, you can check the /etc/group file: 
+> cat /etc/group
+
+To check to which groups belong a username
+> groups USERNAME_HERE
+
+
+
+
+
+
+            *****************************
+            >>> Pasword configuration <<<
+            *****************************
+
+to see/modidy setting password settings: 
+> nano /etc/login.defs
+
+	>> PASS_MAX_DAYS 30 | Makes the password expire every 30 days.
+
+	>> PASS_MIN_DAYS 2 | Minimum number of days before the modification of a password.
+
+	>> PASS_WARN_AGE 7 | Number of days warning given before a password expires. You can leave it as it is.
+
++++ +++ comand "chage" : change user password expiry information +++ +++
+
+Sets PASS_MAX_DAYS to 30 days for user USERNAME_HERE
+> chage -M 30 USERNAME_HERE
+
+Sets PASS_MIN_DAYS to 2 days for user USERNAME_HERE
+> chage -m 2 USERNAME_HERE
+
+To check the user information related to password configurations 
+> chage -l USERNAME_HERE
+
+
+
+
+
+
+            *************************************
+            >>> Pasword configuration Quality <<<
+            *************************************
+intall libpam-pwquality
+> apt install libpam-pwquality
+
+settings Pasword Quality
+> nano /etc/pam.d/common-password
+
+in common-password you will add : 
+----
+pam_pwquality.so retry=3 minlen=10 difok=7 maxrepeat=3 dcredit=-1 ucredit=-1 lcredit=-1 reject_username enforce_for_root
+----
+
+Explanation of each configuration: 
+	>> retry=3 ⬛ Maximum amount of incorrect attempts.
+
+	>> minlen=10 ⬛ Minimum acceptable size for the new password.
+
+	>> difok=7 ⬛ Number of characters in the new password that must not be present in the old password. Even with enforce_for_root, this rule doesn't apply to the root user since the old password is not required to change it.
+
+	>> maxrepeat=3 ⬛ The maximum number of allowed same consecutive characters in the new password.
+
+	>> dcredit=-1 ⬛ Minimum number of digits in the new password. (negative value)
+
+	>> ucredit=-1 ⬛ Minimum number of uppercase characters in the new password. (negative value)
+
+	>> lcredit=-1 ⬛ Minimum number of lowercase characters in the new password. (negative value)
+
+	>> reject_username ⬛ The new password cannot include the username.
+
+	>> enforce_for_root ⬛ Applies rules to root.
+
+With the new rules enforced, update the passwords for both your user account and the root account:
+remember you are doing these to prevent brute-force
+
+Changes the password of USERNAME_HERE :
+> passwd USERNAME_HERE
+
+
+
+
+
+
+            ***************
+            >>>  cron   <<<
+            ***************
+cron : Cron is a job scheduler or automate tasks to run periodically at fixed times, dates, or intervals
+
+cron task every 10 minutes :
+> crontab -e:
+> */10 * * * * /usr/local/bin/monitoring.sh
+
+Cron task every 1 minute :
+> crontab -e:
+> * * * * * /usr/local/bin/monitoring.sh
+
+Place/create somewhere your new monitoring.sh 
+monitoring.sh modification :
+nano monitoring.sh
+
+in monitoring.sh you can add : 
+ (    The "wall" command in Linux is used to send a message to all currently logged-in users.    )
+###########
+###########
+###########
+
+#!/bin/bash
+
+ARCH=$(uname -srvmo)
+PCPU=$(grep 'physical id' /proc/cpuinfo | uniq | wc -l)
+VCPU=$(grep processor /proc/cpuinfo | uniq | wc -l)
+RAM_TOTAL=$(free -h | grep Mem | awk '{print $2}')
+RAM_USED=$(free -h | grep Mem | awk '{print $3}')
+RAM_PERC=$(free -k | grep Mem | awk '{printf("%.2f%%"), $3 / $2 * 100}')
+DISK_TOTAL=$(df -h --total | grep total | awk '{print $2}')
+DISK_USED=$(df -h --total | grep total | awk '{print $3}')
+DISK_PERC=$(df -k --total | grep total | awk '{print $5}')
+CPU_LOAD=$(top -bn1 | grep '^%Cpu' | xargs | awk '{printf("%.1f%%"), $2 + $4}')
+LAST_BOOT=$(who -b | awk '{print($3 " " $4)}')
+LVM=$(if [ $(lsblk | grep lvm | wc -l) -eq 0 ]; then echo no; else echo yes; fi)
+TCP=$(grep TCP /proc/net/sockstat | awk '{print $3}')
+USER_LOG=$(who | wc -l)
+IP_ADDR=$(hostname -I | awk '{print $1}')
+MAC_ADDR=$(ip link show | grep link/ether | awk '{print $2}')
+SUDO_LOG=$(grep COMMAND /var/log/sudo/sudo.log | wc -l)
+
+wall "
+       ------------------------------------------------
+       Architecture    : $ARCH
+       Physical CPUs   : $PCPU
+       Virtual CPUs    : $VCPU
+       Memory Usage    : $RAM_USED/$RAM_TOTAL ($RAM_PERC)
+       Disk Usage      : $DISK_USED/$DISK_TOTAL ($DISK_PERC)
+       CPU Load        : $CPU_LOAD
+       Last Boot       : $LAST_BOOT
+       LVM use         : $LVM
+       TCP Connections : $TCP established
+       Users logged    : $USER_LOG
+       Network         : $IP_ADDR ($MAC_ADDR)
+       Sudo            : $SUDO_LOG commands used
+       ------------------------------------------------"
+
+
+###########
+###########
+###########
+ 
+
+            ******************
+            >>>  signature <<<
+            ******************
+
+In power shell (reminder it will take around 5-10 minutes) : 
+certUtil -hashfile "YOUR_VM_NAME.vdi" sha1
+
+
+
+
